@@ -1,13 +1,16 @@
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 public class Control {
 	
-	BigDecimal cash = new BigDecimal("1000");
-	BigDecimal income = new BigDecimal("0");
+	BigDecimal cash;
+	BigDecimal income;
 	int interval = 100;
 	Frames frame;
-	int clicks = 0;
+	int clicks;
 	
 	Helper[] helper = new Helper[6];
 	Spells[] spell = new Spells[2];
@@ -18,9 +21,12 @@ public class Control {
 	double currentMana = 0;
 	double manaIncome = 2;
 	BigDecimal multiplier = new BigDecimal("1");
-	BigDecimal clickIncome = new BigDecimal("1");
+	BigDecimal clickIncome;
 	double durationTicker = 1;
+	
 	PropertiesHandler propertiesHandler;
+	private Tick fire;
+	private BigDecimal earnedCashOverTime;
 	
 	public Control(){
 		
@@ -47,13 +53,58 @@ public class Control {
 		loadGame();
 		
 		frame = new Frames(this, helper, spell, achievs);
-		Tick fire = new Tick(this);
+		frame.changeLastAchievement();
+		
+		updateCountLabel();
+		
+		if (earnedCashOverTime != null) { // if cash earned over time show dialog
+			JOptionPane.showMessageDialog(new JFrame(), "You earned " + getNumbers(earnedCashOverTime) + "$ over time!");
+		}
+		
+		fire = new Tick(this);
 		fire.start();
 		
 	}
 	
 	private void loadGame() {
-		
+		try {
+			if (propertiesHandler.getProperty("cash") != null) { // testing whether data was saved already
+				income = new BigDecimal(propertiesHandler.getProperty("income"));
+				multiplier = new BigDecimal(propertiesHandler.getProperty("multiplier"));
+				long timestamp = Long.valueOf(propertiesHandler.getProperty("timestamp"));
+				BigDecimal oldCash = new BigDecimal(propertiesHandler.getProperty("cash"));
+				earnedCashOverTime = new BigDecimal((System.currentTimeMillis() - timestamp)/1000.0).multiply(income).multiply(multiplier);
+				cash = oldCash.add(earnedCashOverTime);
+				clickIncome = new BigDecimal(propertiesHandler.getProperty("incomeperclick"));
+				clicks = Integer.valueOf(propertiesHandler.getProperty("clicks"));
+				String lastAchievName = propertiesHandler.getProperty("lastachievement");
+				if (!lastAchievName.equals("none")) {
+					for (Achievements achievement : achievs) {
+						if(achievement.name.equals(lastAchievName)) {
+							setLastAchievement(achievement);
+						}
+					}
+				}
+				for (int i = 0; i < helper.length; i++) {
+					helper[i].count = Integer.valueOf(propertiesHandler.getProperty("helper" + i + "count"));
+					helper[i].cost = new BigDecimal(propertiesHandler.getProperty("helper" + i + "cost"));
+				}
+				
+				for (int i = 0; i < achievs.length; i++) {
+					if (Boolean.valueOf(propertiesHandler.getProperty("achiev" + i + "achieved"))) {
+						achievs[i].setAchieved();
+					}
+				}
+				
+			} else { // no data was saved before -> load defaults
+				cash = new BigDecimal("1000");
+				income = new BigDecimal("0");
+				clickIncome = new BigDecimal("1");
+				clicks = 0;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public String getNumbers(BigDecimal number){
@@ -127,6 +178,9 @@ public class Control {
 	public void setLastAchievement(Achievements ach){
 		
 		lastAchievement = ach;
+		if (frame != null) {
+			frame.changeLastAchievement();
+		}
 		
 	}
 	
@@ -222,7 +276,32 @@ public class Control {
 	}
 
 	public void saveGame() {
-		propertiesHandler.setProperty("testkey", "keyvalue");
+		fire.stopFiring();
+		propertiesHandler.setProperty("cash", cash.toString());
+		propertiesHandler.setProperty("income", income.toString());
+		propertiesHandler.setProperty("incomeperclick", clickIncome.toString());
+		propertiesHandler.setProperty("clicks", String.valueOf(clicks));
+		propertiesHandler.setProperty("timestamp", String.valueOf(System.currentTimeMillis()));
+		propertiesHandler.setProperty("multiplier", multiplier.toString());
+		if (lastAchievement != null) {
+			propertiesHandler.setProperty("lastachievement", lastAchievement.name);
+		}
+		else {
+			propertiesHandler.setProperty("lastachievement", "none");
+		}
+		for (int i = 0; i < helper.length; i++) {
+			propertiesHandler.setProperty("helper" + i + "count", String.valueOf(helper[i].count));
+			propertiesHandler.setProperty("helper" + i + "cost", helper[i].cost.toString());
+		}
+		for (int i = 0; i < achievs.length; i++) {
+			propertiesHandler.setProperty("achiev" + i + "achieved", String.valueOf(achievs[i].achieved));
+		}
 		propertiesHandler.saveProperties();
+		System.exit(0);
+	}
+
+	public void resetGame() {
+		propertiesHandler.deleteProps();
+		Starter.restart();
 	}
 }

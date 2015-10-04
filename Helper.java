@@ -63,14 +63,19 @@ public class Helper extends JButton implements ActionListener{
 		}
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent e) {
 
-			count += 1;
-			ctrl.increaseHelperIncome(getIncome(), clickIncome);
-			ctrl.incrementCash(cost.negate());
-			increaseCost();
-			nameLabel.setText(name + ": $" + ctrl.getNumbers(cost));
-			ctrl.updateCountLabel();
-			
+		addUpHelper();
+		
+	}
+
+	private void addUpHelper() {
+		count += 1;
+		ctrl.increaseHelperIncome(getIncome(), clickIncome);
+		ctrl.incrementCash(cost.negate());
+		increaseCost();
+		nameLabel.setText(name + ": $" + ctrl.getNumbers(cost));
+		ctrl.updateCountLabel();
 	}
 }

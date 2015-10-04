@@ -74,6 +74,11 @@ public class Achievements extends JButton{
 		}
 		setBackground(Color.GREEN);
 		ctrl.setLastAchievement(this);
-		ctrl.frame.changeLastAchievement();
+	}
+
+
+	public void setAchieved() {
+		achieved = true;
+		setBackground(Color.GREEN);
 	}
 }

@@ -25,6 +25,7 @@ public class Frames implements ActionListener{
 	Achievements[] achievs;
 	Control ctrl;
 	JProgressBar manaBar;
+	private JButton resetButton;
 	
 	public Frames(Control ctrl, Helper[] helper, Spells[] spell, Achievements[] achievs){
 		
@@ -62,9 +63,11 @@ public class Frames implements ActionListener{
 		//Buttons
 		achievements = new JButton("Achievements");
 		clickButton = new JButton("CashButton");
+		resetButton = new JButton("Reset Game");
 		clickButton.setPreferredSize(new Dimension(200,80));
 		clickButton.addActionListener(this);
 		achievements.addActionListener(this);
+		resetButton.addActionListener(this);
 		clickPanel.setLayout(new GridLayout(5,1));
 		
 		//Progressbar
@@ -83,6 +86,7 @@ public class Frames implements ActionListener{
 		}
 		upgradePanel.add(tooltipLabel);
 		upgradePanel.add(achievements);
+		upgradePanel.add(resetButton);
 		
 		for(int i = 0; i < spell.length; i++){
 			
@@ -133,6 +137,7 @@ public class Frames implements ActionListener{
 	}
 	
 
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		
 		if(e.getSource().equals(clickButton)){
@@ -148,6 +153,13 @@ public class Frames implements ActionListener{
 			
 			achievementFrame.setVisible(true);
 			
+		}
+		
+		if(e.getSource().equals(resetButton)){
+			mainFrame.setVisible(false);
+			achievementFrame.setVisible(false);
+			
+			ctrl.resetGame();
 		}
 	}
 }

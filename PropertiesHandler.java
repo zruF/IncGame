@@ -62,4 +62,8 @@ public class PropertiesHandler {
 		}
 	}
 
+	public void deleteProps() {
+		propertyPath.delete();
+	}
+
 }
