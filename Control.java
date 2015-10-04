@@ -1,12 +1,5 @@
-import java.awt.BorderLayout;
-import java.awt.Frame;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 public class Control {
 	
@@ -27,6 +20,7 @@ public class Control {
 	BigDecimal multiplier = new BigDecimal("1");
 	BigDecimal clickIncome = new BigDecimal("1");
 	double durationTicker = 1;
+	PropertiesHandler propertiesHandler;
 	
 	public Control(){
 		
@@ -40,7 +34,7 @@ public class Control {
 		
 		//Create Spells
 		spell[0] = new Spells(this, "LAN", 5, 200, 3, "Die Jungs veranstalten eine fette Lanparty. 500% Cash auf alles!");
-		spell[1] = new Spells(this, "Oddys KÃ¶pfer", 8, 600, 4, "Oddy macht ein KÃ¶pfer und splattert sich den Kopf auf. Der Unterhaltungswert steigert die ProduktivitÃ¤t um 800%");
+		spell[1] = new Spells(this, "Oddys Köpfer", 8, 600, 4, "Oddy macht ein Köpfer und splattert sich den Kopf auf. Der Unterhaltungswert steigert die Produktivität um 800%");
 		
 		//Create Achievements
 		achievs[0] = new Achievements(this, "ClickStarter", "Do " + getNumbers(new BigDecimal("10")) + " Clicks on the Cashbutton.", 10, "+1% Income", 1);
@@ -48,12 +42,20 @@ public class Control {
 		achievs[2] = new Achievements(this, "ClickRookie", "Do " + getNumbers(new BigDecimal("250")) + " Clicks on the Cashbutton.", 250, "+5% ClickIncome", 5);
 		achievs[3] = new Achievements(this, "ClickProfi", "Do " + getNumbers(new BigDecimal("1000")) + " Clicks on the Cashbutton", 1000, "+10% ClickIncome", 10);
 		
+		//Create PropertiesHandler and load the old stage of the game
+		propertiesHandler = new PropertiesHandler();
+		loadGame();
+		
 		frame = new Frames(this, helper, spell, achievs);
 		Tick fire = new Tick(this);
 		fire.start();
 		
 	}
 	
+	private void loadGame() {
+		
+	}
+
 	public String getNumbers(BigDecimal number){
 		
 		String showString = "";
@@ -217,5 +219,10 @@ public class Control {
 			
 		}
 
+	}
+
+	public void saveGame() {
+		propertiesHandler.setProperty("testkey", "keyvalue");
+		propertiesHandler.saveProperties();
 	}
 }
