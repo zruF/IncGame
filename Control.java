@@ -1,5 +1,7 @@
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -27,8 +29,18 @@ public class Control {
 	PropertiesHandler propertiesHandler;
 	private Tick fire;
 	private BigDecimal earnedCashOverTime;
+	private Timer timer;
 	
 	public Control(){
+		
+		//Save game every minute
+		timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				saveGame();
+			}
+		}, 60 * 1000, 60 * 1000);
 		
 		//Create Helper
 		helper[0] = new Helper(this, new BigDecimal("20"), new BigDecimal("0.1"), new BigDecimal("0.1"), "Oddy", "Oddy ischt sie alle weg. +0.1 Income | +0.1 Clickincome");
@@ -276,7 +288,6 @@ public class Control {
 	}
 
 	public void saveGame() {
-		fire.stopFiring();
 		propertiesHandler.setProperty("cash", cash.toString());
 		propertiesHandler.setProperty("income", income.toString());
 		propertiesHandler.setProperty("incomeperclick", clickIncome.toString());
@@ -297,11 +308,15 @@ public class Control {
 			propertiesHandler.setProperty("achiev" + i + "achieved", String.valueOf(achievs[i].achieved));
 		}
 		propertiesHandler.saveProperties();
-		System.exit(0);
 	}
 
 	public void resetGame() {
 		propertiesHandler.deleteProps();
 		Starter.restart();
+	}
+
+	public void exitGame() {
+		fire.stopFiring();
+		System.exit(0);
 	}
 }

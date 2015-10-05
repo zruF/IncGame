@@ -118,6 +118,7 @@ public class Frames implements ActionListener{
 			@Override
 			public void windowClosing(WindowEvent e) {
 				ctrl.saveGame();
+				ctrl.exitGame();
 			}
 		});
 		
