@@ -1,8 +1,28 @@
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+
+import org.joda.time.DateTime;
+import org.joda.time.Seconds;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.Hours;
+import org.joda.time.Minutes;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
+import org.joda.time.Seconds;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 
 public class Control {
 	
@@ -57,8 +77,17 @@ public class Control {
 		
 		updateCountLabel();
 		
+		Seconds hDif = Seconds.secondsBetween(new DateTime(getTimeStamp()), DateTime.now());
+		
+		int pDays = ((hDif.getSeconds()/24)/60)/60;
+		int pHours = ((hDif.getSeconds() - (pDays*24*60*60))/60)/60;
+		int pMinutes = ((hDif.getSeconds() - ((pDays*24*60*60) + (pHours*60*60)))/60);
+		int pSeconds = (hDif.getSeconds() - ((pDays*24*60*60) + (pHours*60*60) + (pMinutes*60)));
+		String differenz = pDays + " days and " + pHours + " hours and " + pMinutes + " minutes and " + pSeconds + " seconds";
+		
 		if (earnedCashOverTime != null) { // if cash earned over time show dialog
-			JOptionPane.showMessageDialog(new JFrame(), "You earned " + getNumbers(earnedCashOverTime) + "$ over time!");
+			JOptionPane.showMessageDialog(new JFrame(), "<html> You were offline for " + differenz + "<br>"
+					+ "You earned " + getNumbers(earnedCashOverTime) + "$ over time!");
 		}
 		
 		fire = new Tick(this);
@@ -105,6 +134,12 @@ public class Control {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private long getTimeStamp(){
+		
+		return Long.valueOf(propertiesHandler.getProperty("timestamp"));
+		
 	}
 
 	public String getNumbers(BigDecimal number){
