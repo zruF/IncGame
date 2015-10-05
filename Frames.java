@@ -27,7 +27,7 @@ public class Frames implements ActionListener{
 	JProgressBar manaBar;
 	private JButton resetButton;
 	
-	public Frames(Control ctrl, Helper[] helper, Spells[] spell, Achievements[] achievs){
+	public Frames(final Control ctrl, Helper[] helper, Spells[] spell, Achievements[] achievs){
 		
 		this.achievs = achievs;
 		this.helper = helper;
@@ -115,7 +115,6 @@ public class Frames implements ActionListener{
 		mainFrame.add(statPanel, BorderLayout.CENTER);
 		
 		mainFrame.addWindowListener(new WindowAdapter() {
-			@Override
 			public void windowClosing(WindowEvent e) {
 				ctrl.saveGame();
 				ctrl.exitGame();

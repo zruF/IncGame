@@ -1,10 +1,16 @@
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+
+import org.joda.time.DateTime;
+import org.joda.time.Seconds;
 
 public class Control {
 	
@@ -30,6 +36,8 @@ public class Control {
 	private Tick fire;
 	private BigDecimal earnedCashOverTime;
 	private Timer timer;
+	
+	String[] numberNames = { "K", "Million", "Billion", "Trillion", "Quadrillion", "Quintillion", "Sextillion", "Septillion", "Octillion", "Nonillion", "Decillion" };
 	
 	public Control(){
 		
@@ -69,12 +77,21 @@ public class Control {
 		
 		updateCountLabel();
 		
-		if (earnedCashOverTime != null) { // if cash earned over time show dialog
-			JOptionPane.showMessageDialog(new JFrame(), "You earned " + getNumbers(earnedCashOverTime) + "$ over time!");
-		}
-		
 		fire = new Tick(this);
 		fire.start();
+		
+		Seconds hDif = Seconds.secondsBetween(new DateTime(getTimeStamp()), DateTime.now());
+		
+		int pDays = ((hDif.getSeconds()/24)/60)/60;
+		int pHours = ((hDif.getSeconds() - (pDays*24*60*60))/60)/60;
+		int pMinutes = ((hDif.getSeconds() - ((pDays*24*60*60) + (pHours*60*60)))/60);
+		int pSeconds = (hDif.getSeconds() - ((pDays*24*60*60) + (pHours*60*60) + (pMinutes*60)));
+		String differenz = pDays + " days and " + pHours + " hours and " + pMinutes + " minutes and " + pSeconds + " seconds";
+		
+		if (earnedCashOverTime != null) { // if cash earned over time show dialog
+			JOptionPane.showMessageDialog(new JFrame(), "<html> You were offline for " + differenz + "<br>"
+					+ "You earned " + getNumbers(earnedCashOverTime) + "$ over time!");
+		}
 		
 	}
 	
@@ -118,73 +135,39 @@ public class Control {
 			e.printStackTrace();
 		}
 	}
+	
+	private long getTimeStamp(){
+		
+		try {
+			return Long.valueOf(propertiesHandler.getProperty("timestamp"));
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		}
+		return 0;
+		
+	}
 
 	public String getNumbers(BigDecimal number){
 		
-		String showString = "";
-		
-		if(number.compareTo(new BigDecimal(Math.pow(10, 33))) == 1 || number.compareTo(new BigDecimal(Math.pow(10, 33))) == 0){
-			
-			showString = ((number.divide(new BigDecimal(Math.pow(10, 33)))).setScale(2, RoundingMode.HALF_UP)) + "Decillion";
-					
+		String str = number.toPlainString();
+		if (str.contains(".")) {
+			str = str.substring(0, str.indexOf("."));
 		}
-		else if(number.compareTo(new BigDecimal(Math.pow(10, 30))) == 1 || number.compareTo(new BigDecimal(Math.pow(10, 30))) == 0){
-			
-			showString = ((number.divide(new BigDecimal(Math.pow(10, 30)))).setScale(2, RoundingMode.HALF_UP)) + "Nonillion";
-					
-		}
-		else if(number.compareTo(new BigDecimal(Math.pow(10, 27))) == 1 || number.compareTo(new BigDecimal(Math.pow(10, 27))) == 0){
-					
-			showString = ((number.divide(new BigDecimal(Math.pow(10, 27)))).setScale(2, RoundingMode.HALF_UP)) + "Octillion";
-					
-		}
-		else if(number.compareTo(new BigDecimal(Math.pow(10, 24))) == 1 || number.compareTo(new BigDecimal(Math.pow(10, 24))) == 0){
-			
-			showString = ((number.divide(new BigDecimal(Math.pow(10, 24)))).setScale(2, RoundingMode.HALF_UP)) + "Septillion";
-			
-		}
-		else if(number.compareTo(new BigDecimal(Math.pow(10, 21))) == 1 || number.compareTo(new BigDecimal(Math.pow(10, 21))) == 0){
-			
-			showString = ((number.divide(new BigDecimal(Math.pow(10, 21)))).setScale(2, RoundingMode.HALF_UP)) + "Sextillion";
-			
-		}
-		else if(number.compareTo(new BigDecimal(Math.pow(10, 18))) == 1 || number.compareTo(new BigDecimal(Math.pow(10, 18))) == 0){
-			
-			showString = ((number.divide(new BigDecimal(Math.pow(10, 18)))).setScale(2, RoundingMode.HALF_UP)) + "Quintillion";
-			
-		}
-		else if(number.compareTo(new BigDecimal(Math.pow(10, 15))) == 1 || number.compareTo(new BigDecimal(Math.pow(10, 15))) == 0){
-			
-			showString = ((number.divide(new BigDecimal(Math.pow(10, 15)))).setScale(2, RoundingMode.HALF_UP)) + "Quadrillion";
-			
-		}
-		else if(number.compareTo(new BigDecimal(Math.pow(10, 12))) == 1 || number.compareTo(new BigDecimal(Math.pow(10, 12))) == 0){
-			
-			showString = ((number.divide(new BigDecimal(Math.pow(10, 12)))).setScale(2, RoundingMode.HALF_UP)) + "Trillion";
-			
-		}
-		else if(number.compareTo(new BigDecimal(Math.pow(10, 9))) == 1 || number.compareTo(new BigDecimal(Math.pow(10, 9))) == 0){
-			
-			showString = ((number.divide(new BigDecimal(Math.pow(10, 9)))).setScale(2, RoundingMode.HALF_UP)) + "Billion";
-			
-		}
-		else if(number.compareTo(new BigDecimal(Math.pow(10, 6))) == 1 || number.compareTo(new BigDecimal(Math.pow(10, 6))) == 0){
-			
-			showString = ((number.divide(new BigDecimal(Math.pow(10, 6)))).setScale(2, RoundingMode.HALF_UP)) + "Million";
-			
-		}
-		else if(number.compareTo(new BigDecimal(Math.pow(10, 3))) == 1 || number.compareTo(new BigDecimal(Math.pow(10, 3))) == 0){
-			
-			showString = ((number.divide(new BigDecimal(Math.pow(10, 3)))).setScale(2, RoundingMode.HALF_UP)) + "K";
-			
-		}
-		else {
-			
-			showString = number.setScale(2, RoundingMode.HALF_UP).toString();
-			
-		}
-		
-		return showString;
+		int digits = str.length();
+		if (digits > 3) {
+			if ((digits - 1) / 3 - 1 <= numberNames.length - 1) {
+				return str.substring(0, digits - ((digits - 1) / 3) * 3) + "."
+						+ str.substring(digits - ((digits - 1) / 3) * 3, digits - ((digits - 1) / 3) * 3 + 2)
+						+ numberNames[(digits - 1) / 3 - 1];
+			} else {
+				DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
+				otherSymbols.setDecimalSeparator('.');
+				NumberFormat formatter = new DecimalFormat("0.00E0", otherSymbols);
+				formatter.setRoundingMode(RoundingMode.HALF_UP);
+				return formatter.format(number);
+				
+			} 
+		} else return str;
 	}
 	
 	public void setLastAchievement(Achievements ach){

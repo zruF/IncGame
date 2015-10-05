@@ -53,7 +53,6 @@ public class Achievements extends JButton{
 					getAchievement();
 					
 				}
-				
 			}
 		}
 	}
@@ -62,23 +61,25 @@ public class Achievements extends JButton{
 		
 		if(reward.contains("ClickIncome")){
 			
-			achieved = true;
 			ctrl.increaseIncome(new BigDecimal("0"), new BigDecimal(rewardValue));
 			
 		}
 		else if(reward.contains("Income")){
 			
-			achieved = true;
 			ctrl.increaseIncome(new BigDecimal(rewardValue), new BigDecimal("0"));
 			
 		}
-		setBackground(Color.GREEN);
-		ctrl.setLastAchievement(this);
+		
+		setAchieved();
+		
 	}
 
 
 	public void setAchieved() {
+
 		achieved = true;
+		ctrl.setLastAchievement(this);
 		setBackground(Color.GREEN);
+		
 	}
 }
